@@ -4,8 +4,11 @@ import { motion } from "framer-motion";
 import MonthNavigation from "./dashboard/MonthNavigation";
 import SummaryCardList from "./dashboard/SummaryCardList";
 import AnalyticsCard from "./dashboard/AnalyticsCard";
+import useBudgetStore from "../store/budgetStore";
 
 export default function Dashboard() {
+  const { setQuickModal, resetMonth } = useBudgetStore();
+
   return (
     <>
       {/* MONTH NAV */}
