@@ -1,5 +1,4 @@
 import { exportBackup, importBackup } from "../utils/backup";
-import { motion } from "framer-motion";
 
 import MonthNavigation from "./dashboard/MonthNavigation";
 import SummaryCardList from "./dashboard/SummaryCardList";

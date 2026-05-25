@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { getStorageKey, createDays } from "../utils/calendar";
+import { createSlots } from "../utils/slot";
 
 const today = new Date();
 
@@ -31,7 +32,9 @@ const initialKey = getStorageKey(
 
 const savedDays = JSON.parse(localStorage.getItem(initialKey));
 
+// STATE STRUCTURE
 export default create((set, get) => ({
+  // GETTERS
   year: initialYear,
 
   month: initialMonth,
@@ -51,8 +54,121 @@ export default create((set, get) => ({
     DEFAULT_DAILY_BUDGET,
 
   quickModal: false,
+  slots:
+    JSON.parse(localStorage.getItem("budgetflow-slots")) ||
+    createSlots({
+      startDate: new Date(),
+
+      totalFund: Number(localStorage.getItem("budgetflow-total-fund")) || 0,
+
+      dailyBudget: Number(localStorage.getItem("budgetflow-daily-budget")) || 0,
+      slots: [],
+    }),
+
+  totalFund: Number(localStorage.getItem("budgetflow-total-fund")) || 0,
 
   settingsModal: false,
+
+  hasSetup: Boolean(localStorage.getItem("budgetflow-has-setup")),
+  topUpModal: false,
+  setupModal: true,
+
+  // SETTERS
+  setTopUpModal: (value) => {
+    set({
+      topUpModal: value,
+    });
+  },
+  setSetupModal: (value) => {
+    set({
+      setupModal: value,
+    });
+  },
+
+  setupTracking: ({
+    totalFund,
+
+    dailyBudget,
+  }) => {
+    localStorage.setItem(
+      "budgetflow-has-setup",
+
+      "true",
+    );
+    localStorage.setItem(
+      "budgetflow-total-fund",
+
+      totalFund,
+    );
+
+    localStorage.setItem(
+      "budgetflow-daily-budget",
+
+      dailyBudget,
+    );
+
+    const generated = createSlots({
+      startDate: new Date(),
+
+      totalFund,
+
+      dailyBudget,
+    });
+
+    localStorage.setItem(
+      "budgetflow-slots",
+
+      JSON.stringify(generated),
+    );
+
+    set({
+      totalFund,
+
+      dailyBudget,
+
+      slots: generated,
+
+      hasSetup: true,
+    });
+  },
+
+  topUpFund: ({ totalFund }) => {
+    const state = get();
+
+    const lastSlot = state.slots[state.slots.length - 1];
+
+    const startDate = lastSlot ? new Date(lastSlot.date) : new Date();
+
+    startDate.setDate(startDate.getDate() + 1);
+
+    const generated = createSlots({
+      startDate,
+
+      totalFund,
+
+      dailyBudget: state.dailyBudget,
+    });
+
+    const merged = [...state.slots, ...generated];
+
+    localStorage.setItem(
+      "budgetflow-slots",
+
+      JSON.stringify(merged),
+    );
+
+    localStorage.setItem(
+      "budgetflow-total-fund",
+
+      state.totalFund + totalFund,
+    );
+
+    set({
+      slots: merged,
+
+      totalFund: state.totalFund + totalFund,
+    });
+  },
 
   setQuickModal: (value) => {
     set({
@@ -66,15 +182,33 @@ export default create((set, get) => ({
     });
   },
 
-  setDailyBudget: (amount) => {
+  setDailyBudget: (newDailyBudget) => {
+    const state = get();
+
+    const generated = createSlots({
+      startDate: new Date(),
+
+      totalFund: state.totalFund,
+
+      dailyBudget: newDailyBudget,
+    });
+
     localStorage.setItem(
       "budgetflow-daily-budget",
 
-      amount,
+      newDailyBudget,
+    );
+
+    localStorage.setItem(
+      "budgetflow-slots",
+
+      JSON.stringify(generated),
     );
 
     set({
-      dailyBudget: amount,
+      dailyBudget: newDailyBudget,
+
+      slots: generated,
     });
   },
 
@@ -97,42 +231,38 @@ export default create((set, get) => ({
   quickWithdraw: (amount) => {
     const state = get();
 
-    const slotCount = amount / state.dailyBudget;
+    const updated = [...state.slots];
 
-    const updated = [...state.days];
-
-    let taken = 0;
+    let accumulated = 0;
 
     for (let i = 0; i < updated.length; i++) {
-      if (updated[i].status === "available") {
-        updated[i] = {
-          ...updated[i],
-
-          status: updated[i].day <= state.currentDay ? "used" : "future-used",
-        };
-
-        taken++;
+      if (updated[i].status !== "available") {
+        continue;
       }
 
-      if (taken >= slotCount) {
+      accumulated += updated[i].amount;
+
+      const slotDate = new Date(updated[i].date);
+
+      updated[i] = {
+        ...updated[i],
+
+        status: slotDate <= new Date() ? "used" : "future-used",
+      };
+
+      if (accumulated >= amount) {
         break;
       }
     }
 
-    const key = getStorageKey(
-      state.year,
-
-      state.month,
-    );
-
     localStorage.setItem(
-      key,
+      "budgetflow-slots",
 
       JSON.stringify(updated),
     );
 
     set({
-      days: updated,
+      slots: updated,
     });
   },
 
@@ -145,60 +275,36 @@ export default create((set, get) => ({
 
     if (newMonth > 11) {
       newMonth = 0;
-
       newYear++;
     }
 
     if (newMonth < 0) {
       newMonth = 11;
-
       newYear--;
     }
 
-    const currentMonth = today.getMonth();
+    const slotMonths = state.slots.map((slot) => {
+      const d = new Date(slot.date);
 
-    const currentYear = today.getFullYear();
+      return {
+        year: d.getFullYear(),
 
-    if (
-      newYear > currentYear ||
-      (newYear === currentYear && newMonth > currentMonth)
-    ) {
-      return;
-    }
+        month: d.getMonth(),
+      };
+    });
 
-    if (
-      newYear < firstUseDate.year ||
-      (newYear === firstUseDate.year && newMonth < firstUseDate.month)
-    ) {
-      return;
-    }
-
-    const key = getStorageKey(
-      newYear,
-
-      newMonth,
+    const monthExists = slotMonths.some(
+      (m) => m.year === newYear && m.month === newMonth,
     );
 
-    const saved = JSON.parse(localStorage.getItem(key));
-
-    const freshDays =
-      saved ||
-      createDays(
-        newYear,
-
-        newMonth,
-      );
-
-    const isCurrentMonth = newMonth === currentMonth && newYear === currentYear;
+    if (!monthExists) {
+      return;
+    }
 
     set({
       month: newMonth,
 
       year: newYear,
-
-      days: freshDays,
-
-      currentDay: isCurrentMonth ? today.getDate() : 1,
     });
   },
 
@@ -229,28 +335,30 @@ export default create((set, get) => ({
   },
 
   resetMonth: () => {
-    const state = get();
+    localStorage.removeItem("budgetflow-slots");
 
-    const fresh = createDays(
-      state.year,
+    localStorage.removeItem("budgetflow-total-fund");
 
-      state.month,
-    );
+    localStorage.removeItem("budgetflow-daily-budget");
 
-    const key = getStorageKey(
-      state.year,
-
-      state.month,
-    );
-
-    localStorage.setItem(
-      key,
-
-      JSON.stringify(fresh),
-    );
+    localStorage.removeItem("budgetflow-has-setup");
 
     set({
-      days: fresh,
+      hasSetup: false,
+
+      setupModal: true,
+
+      totalFund: 0,
+
+      dailyBudget: 0,
+
+      slots: [],
+
+      quickModal: false,
+
+      settingsModal: false,
+
+      topUpModal: false,
     });
   },
 }));

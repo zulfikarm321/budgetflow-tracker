@@ -36,6 +36,28 @@ npm install
 npm run dev
 ```
 
+## Quality Checks
+
+Run all project checks before shipping a change:
+
+```bash
+npm run check
+```
+
+Run individual checks:
+
+```bash
+npm run lint
+npm run format:check
+npm run build
+```
+
+Format the project:
+
+```bash
+npm run format
+```
+
 ## Build
 
 ```bash

@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import useBudgetStore from "../../store/budgetStore";
 
 const MonthNavigation = () => {
-  const { month, year, changeMonth, goToCurrentMonth, currentDay } =
+  const { month, year, changeMonth, goToCurrentMonth, currentDay, slots } =
     useBudgetStore();
 
   const now = new Date();
@@ -12,31 +12,47 @@ const MonthNavigation = () => {
   const isFirstMonth = month === firstUse.month && year === firstUse.year;
 
   const isCurrentMonth = month === now.getMonth() && year === now.getFullYear();
+  const nextMonthDate = new Date(
+    year,
+
+    month + 1,
+
+    1,
+  );
+
+  const prevMonthDate = new Date(
+    year,
+
+    month - 1,
+
+    1,
+  );
+
+  const hasPrevMonth = slots.some((slot) => {
+    const d = new Date(slot.date);
+
+    return (
+      d.getMonth() === prevMonthDate.getMonth() &&
+      d.getFullYear() === prevMonthDate.getFullYear()
+    );
+  });
+
+  const hasNextMonth = slots.some((slot) => {
+    const d = new Date(slot.date);
+
+    return (
+      d.getMonth() === nextMonthDate.getMonth() &&
+      d.getFullYear() === nextMonthDate.getFullYear()
+    );
+  });
 
   return (
-    <div className="mb-8 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-      <motion.div
-        key={`${month}-${year}`}
-        initial={{
-          opacity: 0,
+    <div className="sticky top-30 z-40 mb-6 flex flex-col gap-4 rounded-3xl border border-slate-800/70 bg-slate-950/80 p-4 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
+      {/* LEFT */}
 
-          y: 8,
-        }}
-        animate={{
-          opacity: 1,
-
-          y: 0,
-        }}
-        transition={{
-          duration: 0.25,
-        }}
-      >
-        <h2 className="text-2xl font-black text-emerald-400 lg:text-3xl">
-          {new Date(
-            year,
-
-            month,
-          ).toLocaleString(
+      <div className="min-w-0">
+        <h2 className="truncate text-lg font-bold sm:text-xl">
+          {new Date(year, month).toLocaleString(
             "id-ID",
 
             {
@@ -47,45 +63,45 @@ const MonthNavigation = () => {
           )}
         </h2>
 
-        <p className="mt-2 text-slate-400">Current Day: {currentDay}</p>
-      </motion.div>
+        <p className="mt-1 text-sm text-slate-400">
+          {new Date().toLocaleDateString(
+            "id-ID",
 
-      <div className="flex flex-wrap gap-3">
-        {/* PREVIOUS */}
+            {
+              day: "numeric",
 
+              month: "long",
+
+              year: "numeric",
+            },
+          )}
+        </p>
+      </div>
+
+      {/* RIGHT */}
+
+      <div className="grid grid-cols-3 gap-2 sm:flex">
         <button
-          disabled={isFirstMonth}
           onClick={() => changeMonth(-1)}
-          className={`rounded-2xl border px-5 py-3 transition-all active:scale-[0.98] ${
-            isFirstMonth
-              ? `cursor-not-allowed border-slate-800 bg-slate-900/40 text-slate-600`
-              : `cursor-pointer border-slate-700 bg-slate-900 hover:bg-slate-800`
-          } `}
+          disabled={!hasPrevMonth}
+          className="rounded-2xl border border-slate-700 bg-slate-900 px-3 py-3 text-sm transition-all hover:bg-slate-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-slate-900"
         >
-          ← Previous
+          Prev
         </button>
 
-        {/* TODAY */}
-
         <button
-          onClick={() => goToCurrentMonth()}
-          className="cursor-pointer rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-5 py-3 text-emerald-400 transition-all hover:bg-emerald-500/20 active:scale-[0.98]"
+          onClick={goToCurrentMonth}
+          className="rounded-2xl bg-emerald-500/10 px-3 py-3 text-sm text-emerald-400 transition-all hover:bg-emerald-500/20"
         >
-          This month
+          Today
         </button>
 
-        {/* NEXT */}
-
         <button
-          disabled={isCurrentMonth}
           onClick={() => changeMonth(1)}
-          className={`rounded-2xl border px-5 py-3 transition-all active:scale-[0.98] ${
-            isCurrentMonth
-              ? `cursor-not-allowed border-slate-800 bg-slate-900/40 text-slate-600`
-              : `cursor-pointer border-slate-700 bg-slate-900 hover:bg-slate-800`
-          } `}
+          disabled={!hasNextMonth}
+          className="rounded-2xl border border-slate-700 bg-slate-900 px-3 py-3 text-sm transition-all hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
         >
-          Next →
+          Next
         </button>
       </div>
     </div>

@@ -3,14 +3,8 @@ import { formatCurrency } from "../../utils/currency";
 import useDashboardStats from "../../hooks/useDashboardStats";
 
 const SummaryCardList = () => {
-  const {
-    usedSlots,
-    futureDebtSlots,
-    availableSlots,
-    totalWithdraw,
-    allowanceUntilToday,
-    remainingBudget,
-  } = useDashboardStats();
+  const { totalWithdraw, allowanceUntilToday, remainingBudget } =
+    useDashboardStats();
 
   const balance = allowanceUntilToday - totalWithdraw;
 

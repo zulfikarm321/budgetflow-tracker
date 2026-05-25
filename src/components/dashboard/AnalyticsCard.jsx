@@ -4,7 +4,7 @@ import useBudgetStore from "../../store/budgetStore";
 import useDashboardStats from "../../hooks/useDashboardStats";
 
 const AnalyticsCard = () => {
-  const { days } = useBudgetStore();
+  const { slots } = useBudgetStore();
 
   const {
     usedSlots,
@@ -12,18 +12,12 @@ const AnalyticsCard = () => {
     futureDebtSlots,
 
     availableSlots,
-
-    totalWithdraw,
-
-    allowanceUntilToday,
-
-    remainingBudget,
   } = useDashboardStats();
 
-  const totalSlots = days.length;
-  const usedPercent = (usedSlots / totalSlots) * 100;
-  const futurePercent = (futureDebtSlots / totalSlots) * 100;
-  const availablePercent = (availableSlots / totalSlots) * 100;
+  const totalSlots = slots.length;
+  const usedPercent = totalSlots ? (usedSlots / totalSlots) * 100 : 0;
+  const futurePercent = totalSlots ? (futureDebtSlots / totalSlots) * 100 : 0;
+  const availablePercent = totalSlots ? (availableSlots / totalSlots) * 100 : 0;
 
   return (
     <motion.div

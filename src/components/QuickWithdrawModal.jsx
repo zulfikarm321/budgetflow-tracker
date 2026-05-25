@@ -12,24 +12,33 @@ export default function QuickWithdrawModal() {
 
     quickWithdraw,
 
-    days,
+    slots,
     dailyBudget,
   } = useBudgetStore();
 
   const [amount, setAmount] = useState(dailyBudget);
 
-  const availableSlots = days.filter((d) => d.status === "available").length;
+  const maxAmount = slots
 
-  const maxAmount = availableSlots * dailyBudget;
+    .filter((slot) => slot.status === "available")
 
-  const options = Array.from(
-    {
-      length: maxAmount / dailyBudget,
-    },
+    .reduce(
+      (sum, slot) => sum + slot.amount,
 
-    (_, i) => (i + 1) * dailyBudget,
-  );
+      0,
+    );
 
+  const availableSlots = slots.filter((slot) => slot.status === "available");
+
+  const withdrawOptions = [];
+
+  let running = 0;
+
+  for (const slot of availableSlots) {
+    running += slot.amount;
+
+    withdrawOptions.push(running);
+  }
   return (
     <AnimatePresence>
       {quickModal && (
@@ -109,7 +118,7 @@ export default function QuickWithdrawModal() {
               {/* OPTIONS */}
 
               <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
-                {options.map((option) => (
+                {withdrawOptions.map((option) => (
                   <button
                     key={option}
                     onClick={() => setAmount(option)}

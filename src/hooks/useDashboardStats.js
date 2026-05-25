@@ -1,25 +1,49 @@
 import useBudgetStore from "../store/budgetStore";
 
 export default function useDashboardStats() {
-  const {
-    days,
+  const { slots } = useBudgetStore();
 
-    currentDay,
+  const usedSlots = slots.filter((s) => s.status === "used").length;
 
-    dailyBudget,
-  } = useBudgetStore();
+  const futureDebtSlots = slots.filter(
+    (s) => s.status === "future-used",
+  ).length;
 
-  const usedSlots = days.filter((d) => d.status === "used").length;
+  const availableSlots = slots.filter((s) => s.status === "available").length;
 
-  const futureDebtSlots = days.filter((d) => d.status === "future-used").length;
+  const totalWithdraw = slots
 
-  const availableSlots = days.filter((d) => d.status === "available").length;
+    .filter((s) => s.status === "used" || s.status === "future-used")
 
-  const totalWithdraw = (usedSlots + futureDebtSlots) * dailyBudget;
+    .reduce(
+      (sum, slot) => sum + slot.amount,
 
-  const allowanceUntilToday = currentDay * dailyBudget;
+      0,
+    );
 
-  const remainingBudget = availableSlots * dailyBudget;
+  const allowanceUntilToday = slots
+
+    .filter((slot) => {
+      const slotDate = new Date(slot.date);
+
+      return slotDate <= new Date();
+    })
+
+    .reduce(
+      (sum, slot) => sum + slot.amount,
+
+      0,
+    );
+
+  const remainingBudget = slots
+
+    .filter((s) => s.status === "available")
+
+    .reduce(
+      (sum, slot) => sum + slot.amount,
+
+      0,
+    );
 
   return {
     usedSlots,

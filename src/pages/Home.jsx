@@ -6,12 +6,14 @@ import QuickWithdrawModal from "../components/QuickWithdrawModal";
 
 import useBudgetStore from "../store/budgetStore";
 import SettingsModal from "../components/SettingsModal";
+import SetupModal from "../components/modal/SetupModal";
+import TopUpModal from "../components/modal/TopUpModal";
 
-import { Wallet2, Settings } from "lucide-react";
+import { Wallet2, Settings, PlusCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function Home() {
-  const { setQuickModal, setSettingsModal } = useBudgetStore();
+  const { setQuickModal, setSettingsModal, setTopUpModal } = useBudgetStore();
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -20,16 +22,22 @@ export default function Home() {
       <header className="sticky top-0 z-40 border-b border-slate-800 bg-slate-950/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
           <div>
-            <h1 className="text-3xl font-black sm:text-4xl lg:text-5xl">
+            <h1 className="text-2xl font-black sm:text-4xl lg:text-5xl">
               BudgetFlow
             </h1>
 
-            <p className="mt-2 text-sm text-slate-400 sm:text-base">
+            <p className="mt-2 text-xs text-slate-400 sm:text-base">
               Personal Budget Tracker
             </p>
           </div>
 
           <div className="mb-6 flex items-center justify-end gap-3">
+            <button
+              onClick={() => setTopUpModal(true)}
+              className="group flex items-center justify-center rounded-2xl border border-cyan-500/20 bg-cyan-500/10 p-3 text-cyan-400"
+            >
+              <PlusCircle size={20} />
+            </button>
             <button
               onClick={() => setSettingsModal(true)}
               className="group flex cursor-pointer items-center justify-center rounded-2xl border border-slate-700 bg-slate-900 p-3 transition-all duration-300 hover:bg-slate-800 active:scale-[0.98]"
@@ -75,7 +83,8 @@ export default function Home() {
           <CalendarView />
         </div>
       </motion.main>
-
+      <TopUpModal />
+      <SetupModal />
       <QuickWithdrawModal />
       <SettingsModal />
     </div>

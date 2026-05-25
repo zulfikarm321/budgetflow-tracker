@@ -1,12 +1,11 @@
 import { AnimatePresence, motion } from "framer-motion";
 
-import { Settings, Minus, Plus } from "lucide-react";
-
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import useBudgetStore from "../store/budgetStore";
 
 import { formatCurrency } from "../utils/currency";
+import { Settings, Minus, Plus, X } from "lucide-react";
 
 import { MIN_BUDGET, MAX_BUDGET, BUDGET_STEP } from "../constants/budget";
 
@@ -21,16 +20,26 @@ export default function SettingsModal() {
     setDailyBudget,
   } = useBudgetStore();
 
-  const [value, setValue] = useState(dailyBudget);
+  return (
+    <AnimatePresence>
+      {settingsModal && (
+        <SettingsPanel
+          dailyBudget={dailyBudget}
+          setDailyBudget={setDailyBudget}
+          setSettingsModal={setSettingsModal}
+        />
+      )}
+    </AnimatePresence>
+  );
+}
 
-  useEffect(() => {
-    setValue(dailyBudget);
-  }, [dailyBudget]);
+function SettingsPanel({ dailyBudget, setDailyBudget, setSettingsModal }) {
+  const [value, setValue] = useState(dailyBudget);
 
   const increase = () => {
     setValue((prev) =>
       Math.min(
-        prev + STEP,
+        prev + BUDGET_STEP,
 
         MAX_BUDGET,
       ),
@@ -40,7 +49,7 @@ export default function SettingsModal() {
   const decrease = () => {
     setValue((prev) =>
       Math.max(
-        prev - STEP,
+        prev - BUDGET_STEP,
 
         MIN_BUDGET,
       ),
@@ -48,107 +57,114 @@ export default function SettingsModal() {
   };
 
   return (
-    <AnimatePresence>
-      {settingsModal && (
-        <motion.div
-          initial={{
-            opacity: 0,
-          }}
-          animate={{
-            opacity: 1,
-          }}
-          exit={{
-            opacity: 0,
-          }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-        >
-          <motion.div
-            initial={{
-              opacity: 0,
+    <motion.div
+      onClick={() => setSettingsModal(false)}
+      initial={{
+        opacity: 0,
+      }}
+      animate={{
+        opacity: 1,
+      }}
+      exit={{
+        opacity: 0,
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+    >
+      <motion.div
+        onClick={(e) => e.stopPropagation()}
+        initial={{
+          opacity: 0,
 
-              y: 16,
+          y: 16,
 
-              scale: 0.96,
-            }}
-            animate={{
-              opacity: 1,
+          scale: 0.96,
+        }}
+        animate={{
+          opacity: 1,
 
-              y: 0,
+          y: 0,
 
-              scale: 1,
-            }}
-            exit={{
-              opacity: 0,
+          scale: 1,
+        }}
+        exit={{
+          opacity: 0,
 
-              y: 16,
+          y: 16,
 
-              scale: 0.96,
-            }}
-            className="w-full max-w-md rounded-3xl border border-slate-800 bg-slate-900 p-7"
+          scale: 0.96,
+        }}
+        className="w-full max-w-md rounded-3xl border border-slate-800 bg-slate-900 p-7"
+      >
+        {/* HEADER */}
+
+        <div className="mb-8 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Settings size={24} className="text-emerald-400" />
+
+            <h2 className="text-2xl font-black">Settings</h2>
+          </div>
+
+          <button
+            onClick={() => setSettingsModal(false)}
+            className="cursor-pointer rounded-xl p-2 text-slate-400 transition-all hover:bg-slate-800 hover:text-white"
           >
-            {/* HEADER */}
+            <X size={20} />
+          </button>
+        </div>
 
-            <div className="mb-8 flex items-center gap-3">
-              <Settings size={24} className="text-emerald-400" />
+        {/* DAILY BUDGET */}
 
-              <h2 className="text-2xl font-black">Settings</h2>
-            </div>
+        <div>
+          <p className="mb-5 text-sm text-slate-400">Daily Budget</p>
 
-            {/* DAILY BUDGET */}
+          <div className="flex items-center justify-between gap-5 rounded-3xl border border-slate-800 bg-slate-950 p-5">
+            <button
+              onClick={decrease}
+              disabled={value <= MIN_BUDGET}
+              className={`flex items-center justify-center rounded-2xl p-3 transition-all ${
+                value <= MIN_BUDGET
+                  ? `cursor-not-allowed bg-slate-900 text-slate-600`
+                  : `cursor-pointer bg-slate-800 hover:bg-slate-700 active:scale-[0.95]`
+              } `}
+            >
+              <Minus size={18} />
+            </button>
 
-            <div>
-              <p className="mb-5 text-sm text-slate-400">Daily Budget</p>
-
-              <div className="flex items-center justify-between gap-5 rounded-3xl border border-slate-800 bg-slate-950 p-5">
-                <button
-                  onClick={decrease}
-                  disabled={value <= MIN_BUDGET}
-                  className={`flex items-center justify-center rounded-2xl p-3 transition-all ${
-                    value <= MIN_BUDGET
-                      ? `cursor-not-allowed bg-slate-900 text-slate-600`
-                      : `cursor-pointer bg-slate-800 hover:bg-slate-700 active:scale-[0.95]`
-                  } `}
-                >
-                  <Minus size={18} />
-                </button>
-
-                <h3 className="text-2xl font-black text-emerald-400">
-                  {formatCurrency(value)}
-                </h3>
-
-                <button
-                  onClick={increase}
-                  disabled={value >= MAX_BUDGET}
-                  className={`flex items-center justify-center rounded-2xl p-3 transition-all ${
-                    value >= MAX_BUDGET
-                      ? `cursor-not-allowed bg-slate-900 text-slate-600`
-                      : `cursor-pointer bg-slate-800 hover:bg-slate-700 active:scale-[0.95]`
-                  } `}
-                >
-                  <Plus size={18} />
-                </button>
-              </div>
-
-              <p className="mt-4 text-xs text-slate-500">
-                Min 10K • Max 100K • Step 10K
-              </p>
-            </div>
-
-            {/* SAVE */}
+            <h3 className="text-2xl font-black text-emerald-400">
+              {formatCurrency(value)}
+            </h3>
 
             <button
-              onClick={() => {
-                setDailyBudget(value);
-
-                setSettingsModal(false);
-              }}
-              className="mt-8 w-full rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-6 py-4 font-bold text-slate-950 transition-all hover:scale-[1.01] active:scale-[0.98]"
+              onClick={increase}
+              disabled={value >= MAX_BUDGET}
+              className={`flex items-center justify-center rounded-2xl p-3 transition-all ${
+                value >= MAX_BUDGET
+                  ? `cursor-not-allowed bg-slate-900 text-slate-600`
+                  : `cursor-pointer bg-slate-800 hover:bg-slate-700 active:scale-[0.95]`
+              } `}
             >
-              Save Settings
+              <Plus size={18} />
             </button>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          </div>
+
+          <p className="mt-4 text-xs text-slate-500">
+            Min 10K / Max 100K / Step 10K
+          </p>
+        </div>
+
+        {/* SAVE */}
+
+        <button
+          onClick={() => {
+            setDailyBudget(value);
+
+            setSettingsModal(false);
+          }}
+          className="mt-8 w-full rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-6 py-4 font-bold text-slate-950 transition-all hover:scale-[1.01] active:scale-[0.98]"
+        >
+          Save Settings
+        </button>
+      </motion.div>
+    </motion.div>
   );
 }
