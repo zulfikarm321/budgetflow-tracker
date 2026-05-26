@@ -66,7 +66,7 @@ export default function TopUpModal() {
               <div className="flex items-center gap-3">
                 <Wallet size={24} className="text-emerald-400" />
 
-                <h2 className="text-2xl font-black">Top Up Fund</h2>
+                <h2 className="text-2xl font-black">Tambah Dana</h2>
               </div>
 
               <button
@@ -117,7 +117,7 @@ export default function TopUpModal() {
               }}
               className="mt-8 w-full rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-6 py-4 font-bold text-black"
             >
-              Add Fund
+              Tambah Dana
             </button>
           </motion.div>
         </motion.div>

@@ -47,11 +47,11 @@ const MonthNavigation = () => {
   });
 
   return (
-    <div className="sticky top-30 z-40 mb-6 flex flex-col gap-4 rounded-3xl border border-slate-800/70 bg-slate-950/80 p-4 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
+    <div className="sticky top-24 z-40 mb-4 flex flex-col gap-3 rounded-2xl border border-slate-800/70 bg-slate-950/80 p-3 backdrop-blur-xl sm:mb-6 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:rounded-3xl sm:p-4">
       {/* LEFT */}
 
       <div className="min-w-0">
-        <h2 className="truncate text-lg font-bold sm:text-xl">
+        <h2 className="truncate text-base font-bold sm:text-xl">
           {new Date(year, month).toLocaleString(
             "id-ID",
 
@@ -63,7 +63,7 @@ const MonthNavigation = () => {
           )}
         </h2>
 
-        <p className="mt-1 text-sm text-slate-400">
+        <p className="mt-0.5 text-xs text-slate-400 sm:mt-1 sm:text-sm">
           {new Date().toLocaleDateString(
             "id-ID",
 
@@ -80,28 +80,28 @@ const MonthNavigation = () => {
 
       {/* RIGHT */}
 
-      <div className="grid grid-cols-3 gap-2 sm:flex">
+      <div className="grid grid-cols-3 gap-1.5 sm:flex sm:gap-2">
         <button
           onClick={() => changeMonth(-1)}
           disabled={!hasPrevMonth}
           className="rounded-2xl border border-slate-700 bg-slate-900 px-3 py-3 text-sm transition-all hover:bg-slate-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-slate-900"
         >
-          Prev
+          Sebelumnya
         </button>
 
         <button
           onClick={goToCurrentMonth}
-          className="rounded-2xl bg-emerald-500/10 px-3 py-3 text-sm text-emerald-400 transition-all hover:bg-emerald-500/20"
+          className="rounded-xl border border-slate-700 bg-slate-900 px-2 py-2 text-[11px] transition-all hover:bg-slate-800 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-slate-900 sm:rounded-2xl sm:px-3 sm:py-3 sm:text-sm"
         >
-          Today
+          Hari Ini
         </button>
 
         <button
           onClick={() => changeMonth(1)}
           disabled={!hasNextMonth}
-          className="rounded-2xl border border-slate-700 bg-slate-900 px-3 py-3 text-sm transition-all hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-40"
+          className="rounded-xl bg-emerald-500/10 px-2 py-2 text-[11px] text-emerald-400 transition-all hover:bg-emerald-500/20 sm:rounded-2xl sm:px-3 sm:py-3 sm:text-sm"
         >
-          Next
+          Berikutnya
         </button>
       </div>
     </div>

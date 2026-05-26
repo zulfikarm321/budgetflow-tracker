@@ -9,15 +9,15 @@ const SummaryCardList = () => {
   const balance = allowanceUntilToday - totalWithdraw;
 
   return (
-    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-2 xl:grid-cols-4">
       <SummaryCard
-        title="Total Withdraw"
+        title="Total Penarikan"
         value={formatCurrency(totalWithdraw)}
         color="blue"
       />
 
       <SummaryCard
-        title="Allowance Until Today"
+        title="Budget Sampai Hari Ini"
         value={formatCurrency(allowanceUntilToday)}
         color="purple"
       />
@@ -29,7 +29,7 @@ const SummaryCardList = () => {
       />
 
       <SummaryCard
-        title="Remaining Budget"
+        title="Sisa Budget"
         value={formatCurrency(remainingBudget)}
         color="green"
       />

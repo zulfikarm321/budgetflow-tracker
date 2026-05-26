@@ -37,12 +37,15 @@ export default function SummaryCard({
       transition={{
         duration: 0.35,
       }}
-      className={`bg-gradient-to-br ${colors[color]} cursor-pointer rounded-3xl border border-slate-800 p-6 transition-all duration-300 hover:scale-[1.02]`}
+      className={`bg-gradient-to-br ${colors[color]} cursor-pointer rounded-2xl border border-slate-800 p-3.5 transition-all duration-300 hover:scale-[1.02] sm:rounded-3xl sm:p-6`}
     >
-      <p className="text-sm text-slate-400">{title}</p>
+      <p className="text-[10px] text-slate-400 sm:text-sm">{title}</p>
 
-      <h3 className="mt-4 text-3xl font-black">
-        Rp {numericValue.toLocaleString("id-ID")}
+      <h3 className="mt-2 text-sm font-black break-words sm:mt-4 sm:text-2xl lg:text-3xl">
+        Rp{" "}
+        {numericValue >= 1000
+          ? `${Math.round(numericValue / 1000)}K`
+          : numericValue.toLocaleString("id-ID")}
       </h3>
     </motion.div>
   );

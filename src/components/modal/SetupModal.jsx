@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 
 import useBudgetStore from "../../store/budgetStore";
 import { formatCurrency } from "../../utils/currency";
+import Stepper from "../Stepper";
 
 const STEP = 10000;
 
@@ -22,7 +23,7 @@ export default function SetupModal() {
 
   const [mode, setMode] = useState("daily");
 
-  const [totalFund, setTotalFund] = useState(0);
+  const [totalFund, setTotalFund] = useState(100000);
 
   const [dailyBudget, setDailyBudget] = useState(10000);
 
@@ -62,6 +63,8 @@ export default function SetupModal() {
     return remainingDays * dailyBudget;
   }, [mode, totalFund, remainingDays, dailyBudget]);
 
+  const [budgetError, setBudgetError] = useState("");
+
   return (
     <AnimatePresence>
       {!hasSetup && setupModal && (
@@ -91,15 +94,17 @@ export default function SetupModal() {
               y: 0,
               scale: 1,
             }}
-            className="max-h-[90vh] w-full max-w-lg overflow-hidden rounded-3xl border border-slate-800 bg-slate-900"
+            className="max-h-[90vh] w-full max-w-md overflow-hidden rounded-3xl border border-slate-800 bg-slate-900 sm:max-w-lg"
           >
-            <div className="max-h-[90vh] overflow-y-auto p-8">
+            <div className="max-h-[90vh] overflow-y-auto p-5 sm:p-8">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h1 className="text-3xl font-black">Welcome to BudgetFlow</h1>
+                  <h1 className="text-2xl font-black sm:text-3xl">
+                    Welcome to BudgetFlow
+                  </h1>
 
                   <p className="mt-3 text-slate-400">
-                    Setup your tracking budget.
+                    Atur budget harian kamu.
                   </p>
                 </div>
 
@@ -115,25 +120,33 @@ export default function SetupModal() {
 
               <div className="mt-8 grid grid-cols-2 gap-3">
                 <button
-                  onClick={() => setMode("daily")}
+                  onClick={() => {
+                    setMode("daily");
+
+                    setBudgetError("");
+                  }}
                   className={`rounded-2xl py-3 transition-all ${
                     mode === "daily"
                       ? "bg-emerald-500 text-black"
                       : "bg-slate-800"
                   } `}
                 >
-                  Daily Budget
+                  Budget Harian
                 </button>
 
                 <button
-                  onClick={() => setMode("target")}
+                  onClick={() => {
+                    setMode("target");
+
+                    setBudgetError("");
+                  }}
                   className={`rounded-2xl py-3 transition-all ${
                     mode === "target"
                       ? "bg-emerald-500 text-black"
                       : "bg-slate-800"
                   } `}
                 >
-                  Target Date
+                  Target Tanggal
                 </button>
               </div>
 
@@ -143,24 +156,11 @@ export default function SetupModal() {
                 <Stepper
                   className="mt-8"
                   icon={<Wallet size={16} />}
-                  label="Total Fund"
+                  label="Total Dana"
                   value={totalFund}
+                  min={MIN_TOTAL}
                   onInput={(value) => {
-                    const nextFund = Math.max(
-                      value,
-
-                      MIN_TOTAL,
-                    );
-
-                    setTotalFund(nextFund);
-
-                    setDailyBudget((prev) =>
-                      Math.min(
-                        prev,
-
-                        nextFund,
-                      ),
-                    );
+                    setTotalFund(value);
                   }}
                   increase={() => {
                     setTotalFund((prev) => prev + STEP);
@@ -190,25 +190,26 @@ export default function SetupModal() {
               <Stepper
                 className="mt-6"
                 icon={<Coins size={16} />}
-                label="Daily Budget"
+                label="Budget Harian"
                 value={dailyBudget}
+                min={MIN_DAILY}
                 disablePlus={mode === "daily" && dailyBudget >= totalFund}
                 onInput={(value) => {
-                  const safeValue = Math.max(
-                    value,
+                  if (mode === "daily" && value > totalFund) {
+                    setBudgetError(
+                      "Budget harian tidak boleh melebihi total dana.",
+                    );
 
-                    MIN_DAILY,
-                  );
+                    return false;
+                  }
 
-                  setDailyBudget(
-                    mode === "daily"
-                      ? Math.min(
-                          safeValue,
+                  if (mode === "daily") {
+                    setBudgetError("");
+                  }
 
-                          totalFund,
-                        )
-                      : safeValue,
-                  );
+                  setDailyBudget(value);
+
+                  return true;
                 }}
                 increase={() => {
                   setDailyBudget((prev) =>
@@ -231,6 +232,9 @@ export default function SetupModal() {
                   );
                 }}
               />
+              {mode === "daily" && budgetError && (
+                <p className="mt-3 text-sm text-red-400">{budgetError}</p>
+              )}
 
               {/* TARGET MODE */}
 
@@ -238,7 +242,7 @@ export default function SetupModal() {
                 <div className="mt-8">
                   <label className="mb-4 flex items-center gap-2 text-sm text-slate-400">
                     <Calendar size={16} />
-                    Use Until
+                    Digunakan Sampai
                   </label>
 
                   <input
@@ -262,20 +266,20 @@ export default function SetupModal() {
               {/* SUMMARY */}
 
               <div className="mt-8 rounded-2xl border border-slate-800 bg-slate-950 p-5">
-                <p className="text-slate-400">Remaining Days</p>
+                <p className="text-slate-400">Sisa Hari</p>
 
-                <h2 className="mt-2 text-3xl font-black text-emerald-400">
+                <h2 className="mt-2 text-2xl font-black text-emerald-400 sm:text-3xl">
                   {remainingDays}
-                  days
+                  hari
                 </h2>
 
-                <p className="mt-4 text-slate-400">Daily Budget</p>
+                <p className="mt-4 text-slate-400">Budget Harian</p>
 
                 <h3 className="mt-2 text-xl font-black">
                   {formatCurrency(dailyBudget)}
                 </h3>
 
-                <p className="mt-4 text-slate-400">Total Fund</p>
+                <p className="mt-4 text-slate-400">Total Dana</p>
 
                 <h3 className="mt-2 text-xl font-black text-cyan-400">
                   {formatCurrency(calculatedTotal)}
@@ -286,87 +290,24 @@ export default function SetupModal() {
                 onClick={() => {
                   setupTracking({
                     totalFund: calculatedTotal,
-
                     dailyBudget,
                   });
                 }}
-                className="mt-8 w-full rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-6 py-4 font-bold text-black transition-all hover:scale-[1.01]"
+                disabled={
+                  mode === "daily"
+                    ? totalFund < MIN_TOTAL ||
+                      dailyBudget < MIN_DAILY ||
+                      dailyBudget > totalFund
+                    : dailyBudget < MIN_DAILY
+                }
+                className="mt-8 w-full rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-6 py-4 font-bold text-black transition-all hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-40"
               >
-                Start Tracking
+                Mulai Tracking
               </button>
             </div>
           </motion.div>
         </motion.div>
       )}
     </AnimatePresence>
-  );
-}
-
-function Stepper({
-  icon,
-  label,
-  value,
-  increase,
-  decrease,
-  onInput,
-
-  disablePlus = false,
-  disableMinus = false,
-
-  className = "",
-}) {
-  return (
-    <div className={className}>
-      <label className="mb-4 flex items-center gap-2 text-sm text-slate-400">
-        {icon}
-
-        {label}
-      </label>
-
-      <div className="flex items-center justify-between gap-3 rounded-3xl border border-slate-800 bg-slate-950 p-4">
-        {/* MINUS */}
-
-        <button
-          onClick={decrease}
-          disabled={disableMinus}
-          className="rounded-2xl bg-slate-800 p-3 transition-all hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          −
-        </button>
-
-        {/* INPUT */}
-
-        <input
-          type="text"
-          value={`Rp ${value.toLocaleString("id-ID")}`}
-          onChange={(e) => {
-            const raw = e.target.value.replace(/\D/g, "");
-
-            if (!raw) {
-              return;
-            }
-
-            const numeric = Math.round(Number(raw) / STEP) * STEP;
-
-            onInput?.(numeric);
-          }}
-          className="w-full bg-transparent text-center text-2xl font-black text-emerald-400 outline-none"
-        />
-
-        {/* PLUS */}
-
-        <button
-          onClick={increase}
-          disabled={disablePlus}
-          className="rounded-2xl bg-slate-800 p-3 transition-all hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          +
-        </button>
-      </div>
-
-      <p className="mt-2 text-center text-xs text-slate-500">
-        Kelipatan 10.000
-      </p>
-    </div>
   );
 }

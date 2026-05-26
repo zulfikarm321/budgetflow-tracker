@@ -87,12 +87,10 @@ export default function QuickWithdrawModal() {
 
             <div className="flex items-center justify-between border-b border-slate-800 p-5 sm:p-7">
               <div>
-                <h2 className="text-xl font-black sm:text-2xl">
-                  Quick Withdraw
-                </h2>
+                <h2 className="text-xl font-black sm:text-2xl">Tarik Dana</h2>
 
                 <p className="mt-2 text-sm text-slate-400">
-                  Withdraw accumulated budget
+                  Tarik budget yang tersedia
                 </p>
               </div>
 
@@ -108,7 +106,7 @@ export default function QuickWithdrawModal() {
 
             <div className="overflow-y-auto p-5 sm:p-7">
               <div className="mb-8 rounded-2xl border border-slate-800 bg-slate-950 p-5">
-                <p className="text-sm text-slate-400">Available Budget</p>
+                <p className="text-sm text-slate-400">Budget Tersedia</p>
 
                 <h3 className="mt-2 text-2xl font-black text-emerald-400 sm:text-3xl">
                   {formatCurrency(maxAmount)}
@@ -145,7 +143,7 @@ export default function QuickWithdrawModal() {
                 }}
                 className="w-full cursor-pointer rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-6 py-4 text-lg font-bold text-slate-950 transition-all duration-300 hover:scale-[1.01] hover:shadow-lg hover:shadow-cyan-500/20 active:scale-[0.98]"
               >
-                Confirm Withdraw {formatCurrency(amount)}
+                Konfirmasi Penarikan {formatCurrency(amount)}
               </button>
             </div>
           </motion.div>

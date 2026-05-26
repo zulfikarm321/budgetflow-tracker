@@ -145,7 +145,7 @@ export default function CalendarView() {
 
                 <div className="mt-3 hidden text-xs sm:mt-4 sm:block sm:text-sm lg:mt-5 lg:text-base">
                   {visualStatus === "available" && (
-                    <p className="text-green-400">Available Budget</p>
+                    <p className="text-green-400"></p>
                   )}
 
                   {visualStatus === "used" && (

@@ -101,7 +101,7 @@ function SettingsPanel({ dailyBudget, setDailyBudget, setSettingsModal }) {
           <div className="flex items-center gap-3">
             <Settings size={24} className="text-emerald-400" />
 
-            <h2 className="text-2xl font-black">Settings</h2>
+            <h2 className="text-2xl font-black">Pengaturan</h2>
           </div>
 
           <button
@@ -115,7 +115,7 @@ function SettingsPanel({ dailyBudget, setDailyBudget, setSettingsModal }) {
         {/* DAILY BUDGET */}
 
         <div>
-          <p className="mb-5 text-sm text-slate-400">Daily Budget</p>
+          <p className="mb-5 text-sm text-slate-400">Budget Harian</p>
 
           <div className="flex items-center justify-between gap-5 rounded-3xl border border-slate-800 bg-slate-950 p-5">
             <button
@@ -148,7 +148,7 @@ function SettingsPanel({ dailyBudget, setDailyBudget, setSettingsModal }) {
           </div>
 
           <p className="mt-4 text-xs text-slate-500">
-            Min 10K / Max 100K / Step 10K
+            Minimal 10K / Maksimal 100K / Kelipatan 10K
           </p>
         </div>
 
@@ -162,7 +162,7 @@ function SettingsPanel({ dailyBudget, setDailyBudget, setSettingsModal }) {
           }}
           className="mt-8 w-full rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-6 py-4 font-bold text-slate-950 transition-all hover:scale-[1.01] active:scale-[0.98]"
         >
-          Save Settings
+          Simpan Pengaturan
         </button>
       </motion.div>
     </motion.div>

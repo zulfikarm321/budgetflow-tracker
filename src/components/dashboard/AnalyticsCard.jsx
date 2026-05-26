@@ -36,21 +36,23 @@ const AnalyticsCard = () => {
 
         ease: "easeOut",
       }}
-      className="mt-8 rounded-3xl border border-slate-800 bg-slate-900 p-6"
+      className="mt-5 rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:mt-8 sm:rounded-3xl sm:p-6"
     >
-      <h3 className="mb-6 text-xl font-bold">Budget Analytics</h3>
+      <h3 className="mb-4 text-base font-bold sm:mb-6 sm:text-xl">
+        Analisis Budget
+      </h3>
 
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* USED */}
 
         <div>
           <div className="mb-2 flex justify-between">
-            <span className="text-blue-400">Used</span>
+            <span className="text-blue-400">Terpakai</span>
 
             <span>{usedSlots} slot</span>
           </div>
 
-          <div className="h-3 overflow-hidden rounded-full bg-slate-800">
+          <div className="h-3 overflow-hidden rounded-full bg-slate-800 sm:h-3">
             <motion.div
               initial={{
                 width: 0,
@@ -72,7 +74,7 @@ const AnalyticsCard = () => {
 
         <div>
           <div className="mb-2 flex justify-between">
-            <span className="text-orange-400">Future Debt</span>
+            <span className="text-orange-400">Hutang Mendatang</span>
 
             <span>{futureDebtSlots} slot</span>
           </div>
@@ -101,9 +103,9 @@ const AnalyticsCard = () => {
 
         <div>
           <div className="mb-2 flex justify-between">
-            <span className="text-green-400">Available</span>
+            <span className="text-green-400">Tersedia</span>
 
-            <span>{availableSlots} slot</span>
+            <span className="text-slate-300">{usedSlots} slot</span>
           </div>
 
           <div className="h-3 overflow-hidden rounded-full bg-slate-800">
