@@ -3,9 +3,11 @@ import setTopUpModal from "../store/budgetStore";
 import setSettingsModal from "../store/budgetStore";
 import setQuickModal from "../store/budgetStore";
 import useBudgetStore from "../store/budgetStore";
-import { PlusCircle, Wallet2, Settings } from "lucide-react";
+import { PlusCircle, Wallet2, Settings, History } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
+  const navigate = useNavigate();
   const { setQuickModal, setSettingsModal, setTopUpModal } = useBudgetStore();
 
   return (
@@ -22,6 +24,12 @@ const Header = () => {
         </div>
 
         <div className="flex items-center justify-end gap-2 sm:gap-3">
+          <button
+            onClick={() => navigate("/history")}
+            className="group flex items-center justify-center rounded-xl border border-slate-700 bg-slate-900 p-2.5 transition-all hover:bg-slate-800"
+          >
+            <History size={18} />
+          </button>
           <button
             onClick={() => setTopUpModal(true)}
             className="group flex items-center justify-center rounded-2xl border border-cyan-500/20 bg-cyan-500/10 p-3 text-cyan-400"

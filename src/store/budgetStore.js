@@ -41,6 +41,8 @@ export default create((set, get) => ({
 
   currentDay: today.getDate(),
 
+  history: JSON.parse(localStorage.getItem("budgetflow-history")) || [],
+
   days:
     savedDays ||
     createDays(
@@ -135,26 +137,94 @@ export default create((set, get) => ({
   topUpFund: ({ totalFund }) => {
     const state = get();
 
-    const lastSlot = state.slots[state.slots.length - 1];
+    let remainingFund = totalFund;
 
-    const startDate = lastSlot ? new Date(lastSlot.date) : new Date();
+    let updated = [...state.slots];
 
-    startDate.setDate(startDate.getDate() + 1);
+    const today = new Date();
 
-    const generated = createSlots({
-      startDate,
+    today.setHours(0, 0, 0, 0);
 
-      totalFund,
+    /* ===== PAY FUTURE DEBT FIRST ===== */
 
-      dailyBudget: state.dailyBudget,
-    });
+    for (let i = 0; i < updated.length; i++) {
+      const slot = updated[i];
 
-    const merged = [...state.slots, ...generated];
+      if (slot.status !== "future-used") {
+        continue;
+      }
+
+      if (remainingFund <= 0) {
+        break;
+      }
+
+      const needed = state.dailyBudget - slot.amount;
+
+      const give = Math.min(
+        needed,
+
+        remainingFund,
+      );
+
+      remainingFund -= give;
+
+      const restored = slot.amount + give;
+
+      updated[i] = {
+        ...slot,
+
+        amount: restored,
+
+        status: restored >= state.dailyBudget ? "available" : "future-used",
+      };
+    }
+
+    /* ===== CREATE NEW SLOTS ===== */
+
+    if (remainingFund > 0) {
+      const lastSlot = updated[updated.length - 1];
+
+      const startDate = lastSlot ? new Date(lastSlot.date) : new Date();
+
+      startDate.setDate(startDate.getDate() + 1);
+
+      const generated = createSlots({
+        startDate,
+
+        totalFund: remainingFund,
+
+        dailyBudget: state.dailyBudget,
+      });
+
+      updated = [...updated, ...generated];
+    }
+
+    /* ===== HISTORY ===== */
+
+    const nextHistory = [
+      {
+        id: crypto.randomUUID(),
+
+        type: "topup",
+
+        amount: totalFund,
+
+        createdAt: new Date().toISOString(),
+      },
+
+      ...state.history,
+    ];
 
     localStorage.setItem(
       "budgetflow-slots",
 
-      JSON.stringify(merged),
+      JSON.stringify(updated),
+    );
+
+    localStorage.setItem(
+      "budgetflow-history",
+
+      JSON.stringify(nextHistory),
     );
 
     localStorage.setItem(
@@ -164,7 +234,9 @@ export default create((set, get) => ({
     );
 
     set({
-      slots: merged,
+      slots: updated,
+
+      history: nextHistory,
 
       totalFund: state.totalFund + totalFund,
     });
@@ -258,8 +330,11 @@ export default create((set, get) => ({
 
       remaining -= take;
 
-      const slotDate = new Date(slot.date);
+      const slotDate = new Date(slot.date + "T00:00:00");
 
+      const today = new Date();
+
+      today.setHours(0, 0, 0, 0);
       updated[i] = {
         ...slot,
 
@@ -267,7 +342,7 @@ export default create((set, get) => ({
 
         status:
           newAmount <= 0
-            ? slotDate <= new Date()
+            ? slotDate <= today
               ? "used"
               : "future-used"
             : "available",
@@ -280,8 +355,29 @@ export default create((set, get) => ({
       JSON.stringify(updated),
     );
 
+    const nextHistory = [
+      {
+        id: crypto.randomUUID(),
+
+        type: "withdraw",
+
+        amount,
+
+        createdAt: new Date().toISOString(),
+      },
+
+      ...state.history,
+    ];
+
+    localStorage.setItem(
+      "budgetflow-history",
+
+      JSON.stringify(nextHistory),
+    );
+
     set({
       slots: updated,
+      history: nextHistory,
     });
   },
 
@@ -362,6 +458,8 @@ export default create((set, get) => ({
 
     localStorage.removeItem("budgetflow-has-setup");
 
+    localStorage.removeItem("budgetflow-history");
+
     set({
       hasSetup: false,
 
@@ -378,6 +476,7 @@ export default create((set, get) => ({
       settingsModal: false,
 
       topUpModal: false,
+      history: [],
     });
   },
 }));
