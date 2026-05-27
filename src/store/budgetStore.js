@@ -233,26 +233,45 @@ export default create((set, get) => ({
 
     const updated = [...state.slots];
 
-    let accumulated = 0;
+    let remaining = amount;
 
     for (let i = 0; i < updated.length; i++) {
-      if (updated[i].status !== "available") {
+      const slot = updated[i];
+
+      if (slot.status !== "available") {
         continue;
       }
 
-      accumulated += updated[i].amount;
-
-      const slotDate = new Date(updated[i].date);
-
-      updated[i] = {
-        ...updated[i],
-
-        status: slotDate <= new Date() ? "used" : "future-used",
-      };
-
-      if (accumulated >= amount) {
+      if (remaining <= 0) {
         break;
       }
+
+      const slotAmount = slot.amount;
+
+      const take = Math.min(
+        slotAmount,
+
+        remaining,
+      );
+
+      const newAmount = slotAmount - take;
+
+      remaining -= take;
+
+      const slotDate = new Date(slot.date);
+
+      updated[i] = {
+        ...slot,
+
+        amount: newAmount,
+
+        status:
+          newAmount <= 0
+            ? slotDate <= new Date()
+              ? "used"
+              : "future-used"
+            : "available",
+      };
     }
 
     localStorage.setItem(

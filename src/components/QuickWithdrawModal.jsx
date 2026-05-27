@@ -13,10 +13,10 @@ export default function QuickWithdrawModal() {
     quickWithdraw,
 
     slots,
-    dailyBudget,
   } = useBudgetStore();
+  const STEP = 10000;
 
-  const [amount, setAmount] = useState(dailyBudget);
+  const [amount, setAmount] = useState(STEP);
 
   const maxAmount = slots
 
@@ -28,17 +28,16 @@ export default function QuickWithdrawModal() {
       0,
     );
 
-  const availableSlots = slots.filter((slot) => slot.status === "available");
-
   const withdrawOptions = [];
 
-  let running = 0;
-
-  for (const slot of availableSlots) {
-    running += slot.amount;
-
-    withdrawOptions.push(running);
+  for (let i = STEP; i <= maxAmount; i += STEP) {
+    withdrawOptions.push(i);
   }
+
+  if (amount > maxAmount) {
+    setAmount(maxAmount);
+  }
+
   return (
     <AnimatePresence>
       {quickModal && (
