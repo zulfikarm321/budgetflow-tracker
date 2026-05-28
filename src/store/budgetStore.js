@@ -55,6 +55,8 @@ export default create((set, get) => ({
     Number(localStorage.getItem("budgetflow-daily-budget")) ||
     DEFAULT_DAILY_BUDGET,
 
+  historyModal: false,
+
   quickModal: false,
   slots:
     JSON.parse(localStorage.getItem("budgetflow-slots")) ||
@@ -76,6 +78,12 @@ export default create((set, get) => ({
   setupModal: true,
 
   // SETTERS
+  setHistoryModal: (value) => {
+    set({
+      historyModal: value,
+    });
+  },
+
   setTopUpModal: (value) => {
     set({
       topUpModal: value,

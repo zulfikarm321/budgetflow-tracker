@@ -24,19 +24,31 @@ export function createSlots({
   const cursor = new Date(startDate);
 
   for (let i = 0; i < slotCount; i++) {
-    const amount = i === 0 ? dailyBudget + remainder : dailyBudget;
-
     slots.push({
       id: formatDate(cursor),
 
       date: formatDate(cursor),
 
-      amount,
+      amount: dailyBudget,
 
       status: "available",
     });
 
     cursor.setDate(cursor.getDate() + 1);
+  }
+
+  /* remainder slot */
+
+  if (remainder > 0) {
+    slots.push({
+      id: formatDate(cursor),
+
+      date: formatDate(cursor),
+
+      amount: remainder,
+
+      status: "available",
+    });
   }
 
   return slots;

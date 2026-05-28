@@ -1,4 +1,4 @@
-import MonthNavigation from "./dashboard/MonthNavigation";
+import MonthNavigation from "./header/MonthNavigation";
 import SummaryCardList from "./dashboard/SummaryCardList";
 import AnalyticsCard from "./dashboard/AnalyticsCard";
 import useBudgetStore from "../store/budgetStore";
@@ -9,9 +9,6 @@ export default function Dashboard() {
 
   return (
     <>
-      {/* MONTH NAV */}
-      <MonthNavigation />
-
       {/* SUMMARY CARDS */}
       <SummaryCardList />
 
