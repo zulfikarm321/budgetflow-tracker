@@ -2,12 +2,12 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import { useState } from "react";
 
-import useBudgetStore from "../store/budgetStore";
+import useBudgetStore from "../../store/budgetStore";
 
-import { formatCurrency } from "../utils/currency";
+import { formatCurrency } from "../../utils/currency";
 import { Settings, Minus, Plus, X } from "lucide-react";
 
-import { MIN_BUDGET, MAX_BUDGET, BUDGET_STEP } from "../constants/budget";
+import { MIN_BUDGET, MAX_BUDGET, BUDGET_STEP } from "../../constants/budget";
 
 export default function SettingsModal() {
   const {

@@ -1,6 +1,6 @@
-import useBudgetStore from "../store/budgetStore";
+import useBudgetStore from "../../store/budgetStore";
 import { motion } from "framer-motion";
-import { formatCurrency } from "../utils/currency";
+import { formatCurrency } from "../../utils/currency";
 
 export default function CalendarView() {
   const { slots, currentDay, month, year } = useBudgetStore();

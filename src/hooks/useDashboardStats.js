@@ -1,49 +1,67 @@
 import useBudgetStore from "../store/budgetStore";
 
 export default function useDashboardStats() {
-  const { slots } = useBudgetStore();
+  const { slots, dailyBudget } = useBudgetStore();
 
-  const usedSlots = slots.filter((s) => s.status === "used").length;
+  const today = new Date();
 
-  const futureDebtSlots = slots.filter(
-    (s) => s.status === "future-used",
+  today.setHours(0, 0, 0, 0);
+
+  /* ANALYTICS */
+
+  const usedSlots = slots.filter((slot) => {
+    const slotDate = new Date(slot.date + "T00:00:00");
+
+    return slotDate <= today && slot.amount < dailyBudget;
+  }).length;
+
+  const futureDebtSlots = slots.filter((slot) => {
+    const slotDate = new Date(slot.date + "T00:00:00");
+
+    return slotDate > today && slot.amount < dailyBudget;
+  }).length;
+
+  const availableSlots = slots.filter(
+    (slot) => slot.amount >= dailyBudget,
   ).length;
 
-  const availableSlots = slots.filter((s) => s.status === "available").length;
+  /* TOTAL WITHDRAW */
 
-  const totalWithdraw = slots
+  const totalWithdraw = slots.reduce(
+    (sum, slot) =>
+      sum +
+      Math.max(
+        dailyBudget - slot.amount,
 
-    .filter((s) => s.status === "used" || s.status === "future-used")
+        0,
+      ),
 
-    .reduce(
-      (sum, slot) => sum + slot.amount,
+    0,
+  );
 
-      0,
-    );
+  /* ALLOWANCE TODAY */
 
-  const allowanceUntilToday = slots
+  const allowanceUntilToday = slots.reduce(
+    (sum, slot) => {
+      const slotDate = new Date(slot.date + "T00:00:00");
 
-    .filter((slot) => {
-      const slotDate = new Date(slot.date);
+      if (slotDate <= today) {
+        return sum + dailyBudget;
+      }
 
-      return slotDate <= new Date();
-    })
+      return sum;
+    },
 
-    .reduce(
-      (sum, slot) => sum + slot.amount,
+    0,
+  );
 
-      0,
-    );
+  /* REMAINING */
 
-  const remainingBudget = slots
+  const remainingBudget = slots.reduce(
+    (sum, slot) => sum + slot.amount,
 
-    .filter((s) => s.status === "available")
-
-    .reduce(
-      (sum, slot) => sum + slot.amount,
-
-      0,
-    );
+    0,
+  );
 
   return {
     usedSlots,

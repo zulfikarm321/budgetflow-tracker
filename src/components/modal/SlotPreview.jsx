@@ -1,4 +1,4 @@
-import useBudgetStore from "../store/budgetStore";
+import useBudgetStore from "../../store/budgetStore";
 
 export default function SlotPreview() {
   const { slots } = useBudgetStore();

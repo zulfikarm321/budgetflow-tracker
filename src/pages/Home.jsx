@@ -1,25 +1,21 @@
-import Dashboard from "../components/Dashboard";
+import CalendarView from "../components/calendar/CalendarView";
 
-import CalendarView from "../components/CalendarView";
-
-import QuickWithdrawModal from "../components/QuickWithdrawModal";
+import QuickWithdrawModal from "../components/modal/QuickWithdrawModal";
 
 import useBudgetStore from "../store/budgetStore";
-import SettingsModal from "../components/SettingsModal";
+import SettingsModal from "../components/modal/SettingsModal";
 import SetupModal from "../components/modal/SetupModal";
 import TopUpModal from "../components/modal/TopUpModal";
-import HistoryModal from "../components/history/HistoryModal";
+import HistoryModal from "../components/modal/HistoryModal";
 
 import { Wallet2, Settings, PlusCircle } from "lucide-react";
 import { motion } from "framer-motion";
-import Header from "../components/Header";
-import SummaryCardList from "../components/dashboard/SummaryCardList";
+import Header from "../components/header/Header";
+import SummaryCardList from "../components/summary/SummaryCardList";
 import AnalyticsCard from "../components/dashboard/AnalyticsCard";
 import ButtonSection from "../components/dashboard/ButtonSection";
 
 export default function Home() {
-  const { setQuickModal, setSettingsModal, setTopUpModal } = useBudgetStore();
-
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       {/* STICKY HEADER */}

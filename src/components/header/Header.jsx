@@ -1,8 +1,8 @@
-import useBudgetStore from "../store/budgetStore";
+import useBudgetStore from "../../store/budgetStore";
 
-import HeaderLogo from "./header/HeaderLogo";
-import HeaderButton from "./header/HeaderButton";
-import MonthNavigation from "./header/MonthNavigation";
+import HeaderLogo from "./HeaderLogo";
+import HeaderButton from "./HeaderButton";
+import MonthNavigation from "./MonthNavigation";
 
 const Header = () => {
   return (

@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 
 import useBudgetStore from "../../store/budgetStore";
 import { formatCurrency } from "../../utils/currency";
-import Stepper from "../Stepper";
+import Stepper from "./Stepper";
 
 const STEP = 10000;
 
@@ -67,7 +67,7 @@ export default function SetupModal() {
 
   return (
     <AnimatePresence>
-      {!hasSetup && setupModal && (
+      {setupModal && (
         <motion.div
           onClick={() => {
             setSetupModal?.(false);
@@ -100,7 +100,7 @@ export default function SetupModal() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <h1 className="text-2xl font-black sm:text-3xl">
-                    Welcome to BudgetFlow
+                    {hasSetup ? "Setup Ulang Budget" : "Welcome to BudgetFlow"}
                   </h1>
 
                   <p className="mt-3 text-slate-400">

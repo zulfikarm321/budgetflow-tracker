@@ -75,7 +75,7 @@ export default create((set, get) => ({
 
   hasSetup: Boolean(localStorage.getItem("budgetflow-has-setup")),
   topUpModal: false,
-  setupModal: true,
+  setupModal: !Boolean(localStorage.getItem("budgetflow-has-setup")),
 
   // SETTERS
   setHistoryModal: (value) => {
@@ -149,16 +149,12 @@ export default create((set, get) => ({
 
     let updated = [...state.slots];
 
-    const today = new Date();
-
-    today.setHours(0, 0, 0, 0);
-
-    /* ===== PAY FUTURE DEBT FIRST ===== */
+    /* ===== FILL PARTIAL SLOTS FIRST ===== */
 
     for (let i = 0; i < updated.length; i++) {
       const slot = updated[i];
 
-      if (slot.status !== "future-used") {
+      if (slot.amount >= state.dailyBudget) {
         continue;
       }
 
@@ -183,11 +179,11 @@ export default create((set, get) => ({
 
         amount: restored,
 
-        status: restored >= state.dailyBudget ? "available" : "future-used",
+        status: restored >= state.dailyBudget ? "available" : slot.status,
       };
     }
 
-    /* ===== CREATE NEW SLOTS ===== */
+    /* ===== APPEND NEW DAYS ===== */
 
     if (remainingFund > 0) {
       const lastSlot = updated[updated.length - 1];
@@ -265,10 +261,16 @@ export default create((set, get) => ({
   setDailyBudget: (newDailyBudget) => {
     const state = get();
 
+    const currentFund = state.slots.reduce(
+      (sum, slot) => sum + slot.amount,
+
+      0,
+    );
+
     const generated = createSlots({
       startDate: new Date(),
 
-      totalFund: state.totalFund,
+      totalFund: currentFund,
 
       dailyBudget: newDailyBudget,
     });
@@ -285,8 +287,16 @@ export default create((set, get) => ({
       JSON.stringify(generated),
     );
 
+    localStorage.setItem(
+      "budgetflow-total-fund",
+
+      currentFund,
+    );
+
     set({
       dailyBudget: newDailyBudget,
+
+      totalFund: currentFund,
 
       slots: generated,
     });
